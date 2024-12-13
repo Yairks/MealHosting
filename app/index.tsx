@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { red } from "react-native-reanimated/lib/typescript/Colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -7,10 +7,15 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 export default function Index() {
   const [name, setName] = useState("")
   const [names, setNames] = useState<string[]>([])
+  const addNameRef = useRef<TextInput>(null);
 
   const addName = () => {
     setNames([...names, name]);
     setName("");
+    if (addNameRef.current) {
+      addNameRef.current.blur();
+      addNameRef.current.clear();
+    }
   }
 
   const deleteName = (removeIndex: number) => {
@@ -33,7 +38,9 @@ export default function Index() {
           <TextInput
             style={styles.input}
             onChangeText={setName}
-            placeholder="Name" />
+            onSubmitEditing={() => addName()}
+            placeholder="Name"
+            ref={addNameRef} />
           <Pressable style={{
             height: 40,
             marginTop: 12,
@@ -53,8 +60,8 @@ export default function Index() {
               data={names}
               renderItem={(name) =>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text onPress={() => { deleteName(name.index) }} style={{ color: "red", fontWeight: "bold", fontSize: 24 }}>X</Text>
-                  <Text style={{ verticalAlign: "top", fontSize: 18 }}>    {name.item}  </Text>
+                  <Text onPress={() => { deleteName(name.index) }} style={{ color: "red", fontWeight: "bold", fontSize: 24, paddingRight: 4 }}>X</Text>
+                  <Text style={{ verticalAlign: "top", fontSize: 18, paddingLeft: 4 }}>{name.item}</Text>
                 </View>
               } />
           </View>
