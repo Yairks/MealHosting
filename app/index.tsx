@@ -3,13 +3,27 @@ import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-na
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { FontAwesome6 } from "@expo/vector-icons";
+import * as SQLite from 'expo-sqlite';
+import * as Crypto from 'expo-crypto';
 
+type mealDBEntry = {
+  meal_id: string,
+  date: string,
+  name: string,
+  status: string
+}
 
 export default function Index() {
+  const db = SQLite.openDatabaseSync('meals');
+  db.execSync(`
+    PRAGMA journal_mode = WAL;
+    CREATE TABLE IF NOT EXISTS meals (meal_id TEXT NOT NULL, date TEXT NOT NULL, name TEXT NOT NULL, status TEXT NOT NULL, PRIMARY KEY(name, meal_id));
+  `);
   const [name, setName] = useState("")
   const [names, setNames] = useState<string[]>([])
   const addNameRef = useRef<TextInput>(null);
   const [date, setDate] = useState(new Date(Date.now()))
+  const [entries, setEntries] = useState<string>()
 
   const addName = () => {
     setNames([...names, name]);
@@ -42,19 +56,43 @@ export default function Index() {
 
   const getMonthName = (month: number) => {
     switch (month) {
-      case 0: return "Jan"
-      case 1: return "Feb"
-      case 2: return "Mar"
-      case 3: return "Apr"
-      case 4: return "May"
-      case 5: return "Jun"
-      case 6: return "Jul"
-      case 7: return "Aug"
-      case 8: return "Sep"
-      case 9: return "Oct"
-      case 10: return "Nov"
-      case 11: return "Dec"
+      case 0: return "Jan";
+      case 1: return "Feb";
+      case 2: return "Mar";
+      case 3: return "Apr";
+      case 4: return "May";
+      case 5: return "Jun";
+      case 6: return "Jul";
+      case 7: return "Aug";
+      case 8: return "Sep";
+      case 9: return "Oct";
+      case 10: return "Nov";
+      case 11: return "Dec";
     }
+  };
+
+  const saveMeal = () => {
+    const byteArray = new Uint8Array(4);
+    Crypto.getRandomValues(byteArray);
+    const statement = db.prepareSync(
+      'INSERT INTO meals VALUES ($mealId, $date, $name, $status)'
+    );
+    try {
+      const mealId = btoa(String.fromCharCode(...new Uint8Array(byteArray)));
+      names.map((name) => {
+        let result = statement.executeSync({
+          $mealId: mealId, $date: date.toDateString(), $name: name, $status: 'invited'
+        });
+      })
+
+    } finally {
+      statement.finalizeSync();
+    }
+
+    setNames([])
+    let meals: mealDBEntry[] = db.getAllSync("SELECT * FROM meals")
+
+    setEntries(JSON.stringify(meals))
   }
 
   return (
@@ -91,7 +129,6 @@ export default function Index() {
           <Pressable style={{
             height: 40,
             marginTop: 12,
-            // marginRight: 10,
             borderWidth: 1,
             padding: 10,
             justifyContent: "center",
@@ -114,6 +151,21 @@ export default function Index() {
               } />
           </View>
         )}
+        {/* Save Meal */}
+        <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 12, }}>
+          <Pressable onPress={saveMeal}>
+            <Text style={{
+              height: 40,
+              borderWidth: 1,
+              padding: 10,
+              flex: 0
+            }}>Save Meal</Text>
+          </Pressable>
+        </View>
+        <View>
+          <Text>MEALS!</Text>
+          <Text>{entries}</Text>
+        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
