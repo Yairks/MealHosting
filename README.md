@@ -8,4 +8,4 @@ This is a simple React Native app for me to learn how this tech works.
 Follow this guide and hope for the best: https://reactnative.dev/docs/running-on-device
 
 ## Example
-https://github.com/user-attachments/assets/c20c7ea7-5121-431d-91cd-b5b048c824b6
+https://github.com/user-attachments/assets/ef22d773-f1ef-4a22-80ce-362b2aaba8b7
