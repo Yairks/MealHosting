@@ -9,4 +9,4 @@ Follow this guide and hope for the best: https://reactnative.dev/docs/running-on
 Usually `npm run android` does it for me.
 
 ## Example
-https://github.com/user-attachments/assets/c20c7ea7-5121-431d-91cd-b5b048c824b6
+https://github.com/user-attachments/assets/ef22d773-f1ef-4a22-80ce-362b2aaba8b7
