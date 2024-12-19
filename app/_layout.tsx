@@ -12,7 +12,9 @@ export default function RootLayout() {
 
     return (
         <SQLiteProvider databaseName="meals.db" onInit={initDB}>
-            <Stack />
+            <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
         </SQLiteProvider>
     );
 }

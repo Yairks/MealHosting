@@ -6,10 +6,10 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import MealsList from "@/components/MealsList";
 import { useDBOperations } from "@/util/dbOperations";
 import { getMonthName } from "@/util/helperFunctions";
+import log from "@/util/logger";
 
 
-
-export default function Index() {
+export default function Meals() {
     const dbOperations = useDBOperations()
     const [name, setName] = useState("")
     const [names, setNames] = useState<string[]>([])
@@ -17,7 +17,19 @@ export default function Index() {
     const [date, setDate] = useState(new Date(Date.now()))
     const [meals, setMeals] = useState(dbOperations.getMealsFromDB())
 
+    log.debug("This is a Debug log");
+    log.info("This is an Info log");
+    log.warn("This is a Warning log");
+    log.error("This is an Error log");
+
     const addName = () => {
+        console.log("New name: " + name)
+        log.info("New name: " + name)
+        // No empty names
+        if (name === "") {
+            return;
+        }
+
         setNames([...names, name]);
         setName("");
         if (addNameRef.current) {
