@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
+import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 
 export default function RootLayout() {
     async function initDB(db: SQLiteDatabase) {
