@@ -9,6 +9,7 @@ import { getMonthName } from "@/util/helperFunctions";
 import log from "@/util/logger";
 import * as Contacts from 'expo-contacts';
 import { AutocompleteDropdown, AutocompleteDropdownContextProvider, AutocompleteDropdownItem } from "react-native-autocomplete-dropdown";
+import React from "react";
 
 export default function Meals() {
     const dbOperations = useDBOperations()
@@ -107,18 +108,18 @@ export default function Meals() {
                     marginRight: 20
                 }}>
                     <View>
-                        <AutocompleteDropdown
+                        {/* <AutocompleteDropdown
                             clearOnFocus={false}
                             closeOnBlur={true}
                             closeOnSubmit={false}
                             initialValue={{ id: '2' }} // or just '2'
-                            onSelectItem={item => item && setSelectedItem(item)}
+                            onSelectItem={item => item ? setSelectedItem(item) : null}
                             dataSet={[
                                 { id: '1', title: 'Alpha' },
                                 { id: '2', title: 'Beta' },
                                 { id: '3', title: 'Gamma' },
                             ]}
-                        />;
+                        />; */}
                     </View>
                     <FlatList
                         data={[{}]}
@@ -166,7 +167,7 @@ export default function Meals() {
                                     </View>
                                     {/* List of names */}
                                     {
-                                        (names.length > 0) && (
+                                        (names.length > 0) ? (
                                             <View style={{ marginTop: 8 }}>
                                                 <Text style={{ fontSize: 18, fontWeight: "bold" }}>People:</Text>
                                                 <FlatList
@@ -178,7 +179,7 @@ export default function Meals() {
                                                         </View>
                                                     } />
                                             </View>
-                                        )
+                                        ) : null
                                     }
                                     {/* Save Meal */}
                                     <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 12, }}>
