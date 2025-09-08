@@ -1,5 +1,6 @@
 import { Meals } from "@/util/dbOperations";
 import { getMonthName } from "@/util/helperFunctions";
+import React from "react";
 import { View, Text, FlatList, SectionList } from "react-native";
 
 type MealsListProps = {
