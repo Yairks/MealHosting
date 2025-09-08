@@ -9,27 +9,21 @@ import { getMonthName } from "@/util/helperFunctions";
 import log from "@/util/logger";
 import * as Contacts from 'expo-contacts';
 import React from "react";
-import Dropdown from 'react-native-input-select';
 import NamesDropdown from "@/components/NamesDropdown";
 
 export default function Meals() {
     const dbOperations = useDBOperations()
+    const [nameIds, setNameIds] = useState<string[]>([])
     const [names, setNames] = useState<string[]>([])
-    const [listoNames, setlistoNames] = useState<string[]>([])
     const [date, setDate] = useState(new Date(Date.now()))
     const [meals, setMeals] = useState(dbOperations.getMealsFromDB())
     const [contacts, setContacts] = useState<Contacts.Contact[]>([])
     const [contactsList, setContactsList] = useState<{ label: React.ReactElement, value: string }[]>([])
-    const [searchTerm, setSearchTerm] = useState<string>("")
 
     log.debug("This is a Debug log");
     log.info("This is an Info log");
     log.warn("This is a Warning log");
     log.error("This is an Error log");
-
-    useEffect(() => {
-        setlistoNames(names)
-    }, [names])
 
     useEffect(() => {
         (async () => {
@@ -80,8 +74,13 @@ export default function Meals() {
         })();
     }, []);
 
+    useEffect(() => {
+        const names = nameIds.map(id => contacts.filter(contact => id === contact.id)!![0].name)
+        setNames(names)
+    }, [nameIds])
+
     const deleteName = (removeIndex: number) => {
-        setNames(names.filter((name, i) => i != removeIndex))
+        setNameIds(nameIds.filter((name, i) => i != removeIndex))
     }
 
     const onChange = (_: any, selectedDate: Date | undefined) => {
@@ -102,7 +101,7 @@ export default function Meals() {
 
     const saveMeal = () => {
         dbOperations.saveMeal(date, names);
-        setNames([]);
+        setNameIds([]);
         setMeals(dbOperations.getMealsFromDB())
     }
 
@@ -114,20 +113,6 @@ export default function Meals() {
                 marginLeft: 20,
                 marginRight: 20
             }}>
-                <View>
-                    {/* <AutocompleteDropdown
-                            clearOnFocus={false}
-                            closeOnBlur={true}
-                            closeOnSubmit={false}
-                            initialValue={{ id: '2' }} // or just '2'
-                            onSelectItem={item => item ? setSelectedItem(item) : null}
-                            dataSet={[
-                                { id: '1', title: 'Alpha' },
-                                { id: '2', title: 'Beta' },
-                                { id: '3', title: 'Gamma' },
-                            ]}
-                        />; */}
-                </View>
                 <FlatList
                     data={[{}]}
                     contentContainerStyle={{ paddingBottom: 20 }}
@@ -148,43 +133,19 @@ export default function Meals() {
                                     </View>
                                     <FontAwesome6 name="angle-down" iconStyle="brand" style={{ fontSize: 18, marginRight: 10 }} />
                                 </Pressable >
-                                {/* Add new name */}
-                                {/* < View style={{
-                                    flexDirection: "row",
-                                    justifyContent: "space-between"
-                                }}>
-                                    <TextInput
-                                        style={styles.input}
-                                        onChangeText={setName}
-                                        onSubmitEditing={() => addName()}
-                                        placeholder="Name"
-                                        ref={addNameRef} />
-                                    <Pressable
-                                        style={{
-                                            height: 40,
-                                            marginTop: 12,
-                                            borderWidth: 1,
-                                            padding: 10,
-                                            justifyContent: "center",
-                                            alignContent: "center",
-                                        }}
-                                        onPress={addName}>
-                                        <Text>Add</Text>
-                                    </Pressable>
-                                </View> */}
                                 <NamesDropdown
                                     contactsList={contactsList}
                                     setContactsList={setContactsList}
-                                    names={names}
-                                    setNames={setNames}
+                                    nameIds={nameIds}
+                                    setNames={setNameIds}
                                 />
                                 {/* List of names */}
-                                {/* {
-                                    (listoNames.length > 0) ? (
+                                {
+                                    (names.length > 0) ? (
                                         <View style={{ marginTop: 8 }}>
                                             <Text style={{ fontSize: 18, fontWeight: "bold" }}>People:</Text>
                                             <FlatList
-                                                data={listoNames}
+                                                data={names}
                                                 renderItem={(name) =>
                                                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                         <Text onPress={() => { deleteName(name.index) }} style={{ color: "red", fontWeight: "bold", fontSize: 24, paddingRight: 4 }}>X</Text>
@@ -193,7 +154,7 @@ export default function Meals() {
                                                 } />
                                         </View>
                                     ) : null
-                                } */}
+                                }
                                 {/* Save Meal */}
                                 <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 12, }}>
                                     <Pressable onPress={saveMeal}>
@@ -215,37 +176,3 @@ export default function Meals() {
         </SafeAreaProvider >
     );
 }
-
-const styles = StyleSheet.create({
-    input: {
-        height: 40,
-        marginTop: 12,
-        marginRight: 20,
-        borderWidth: 1,
-        padding: 10,
-        flex: 1,
-    },
-    dropdown: {
-        margin: 16,
-        height: 50,
-        borderBottomColor: 'gray',
-        borderBottomWidth: 0.5,
-    },
-    icon: {
-        marginRight: 5,
-    },
-    placeholderStyle: {
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
-    },
-});
