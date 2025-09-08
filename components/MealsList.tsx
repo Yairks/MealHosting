@@ -5,11 +5,13 @@ import { View, Text, FlatList, SectionList } from "react-native";
 
 type MealsListProps = {
     meals: Meals[]
+    deleteMeal: (mealId: string) => void
 }
 
-export default function MealsList({ meals }: MealsListProps) {
+export default function MealsList({ meals, deleteMeal }: MealsListProps) {
     const sectionedMeals = meals.map(meal => {
         return {
+            id: meal.id,
             date: meal.date,
             data: meal.guests
         }
@@ -32,7 +34,7 @@ export default function MealsList({ meals }: MealsListProps) {
                     return (
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                             <Text style={{ fontWeight: "bold", fontSize: 18 }}>{getMonthName(meal.section.date.getMonth())} {meal.section.date.getDate()}, {meal.section.date.getFullYear()} </Text>
-                            <Text onPress={() => { }} style={{ color: "red", fontWeight: "bold", fontSize: 12, paddingRight: 4, paddingLeft: 4 }}>delete</Text>
+                            <Text onPress={() => { deleteMeal(meal.section.id) }} style={{ color: "red", fontWeight: "bold", fontSize: 12, paddingRight: 4, paddingLeft: 4 }}>delete</Text>
                         </View>
                     )
                 }}

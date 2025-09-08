@@ -85,7 +85,7 @@ export default function NamesDropdown({
                 </View>
             }
             searchControls={{ searchCallback: value => setSearchTerm(value) }}
-            listControls={{ keyboardShouldPersistTaps: "always" }}
+            listControls={{ keyboardShouldPersistTaps: "always", hideSelectAll: true }}
             ref={dropdownRef}
         />
     );

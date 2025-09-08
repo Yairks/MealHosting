@@ -105,6 +105,11 @@ export default function Meals() {
         setMeals(dbOperations.getMealsFromDB())
     }
 
+    const deleteMeal = (mealId: string) => {
+        dbOperations.deleteMeal(mealId)
+        setMeals(dbOperations.getMealsFromDB())
+    }
+
     return (
         <SafeAreaProvider>
             <SafeAreaView style={{
@@ -167,7 +172,7 @@ export default function Meals() {
                                     </Pressable>
                                 </View>
                                 {/* Show the meals */}
-                                <MealsList meals={meals} />
+                                <MealsList meals={meals} deleteMeal={deleteMeal} />
                             </View>
                         )
                     }}>

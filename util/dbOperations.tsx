@@ -74,5 +74,21 @@ export const useDBOperations = () => {
         }
     }
 
-    return { getMealsFromDB, saveMeal }
+    const deleteMeal = (mealId: string) => {
+        const deleteMealStatement = db.prepareSync(
+            'DELETE FROM meals WHERE id = $mealId;'
+        );
+
+        try {
+            // Delete the meal
+            deleteMealStatement.executeSync({
+                $mealId: mealId
+            });
+
+        } finally {
+            deleteMealStatement.finalizeSync();
+        }
+    }
+
+    return { getMealsFromDB, saveMeal, deleteMeal }
 }
