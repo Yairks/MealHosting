@@ -1,5 +1,6 @@
 import { useSQLiteContext } from "expo-sqlite"
 import * as Crypto from 'expo-crypto';
+import { Guest } from "@/app/(tabs)";
 
 export type MealDBEntry = {
     id: string,
@@ -44,17 +45,17 @@ export const useDBOperations = () => {
         return mealsWithGuests;
     }
 
-    const saveMeal = (date: Date, names: string[]) => {
+    const saveMeal = (date: Date, guests: Guest[]) => {
         const byteArray = new Uint8Array(4);
         Crypto.getRandomValues(byteArray);
         const mealStatement = db.prepareSync(
             'INSERT INTO meals VALUES ($mealId, $date)'
         );
         const guestStatement = db.prepareSync(
-            'INSERT INTO guests VALUES ($mealId, $name, $status)'
+            'INSERT INTO guests VALUES ($mealId, $guest_id, $name, $status)'
         );
         try {
-            const mealId = btoa(String.fromCharCode(...new Uint8Array(byteArray)));
+            const mealId = "M" + Crypto.randomUUID().substring(0, 5)
 
             // Create new meal
             mealStatement.executeSync({
@@ -62,9 +63,9 @@ export const useDBOperations = () => {
             });
 
             // Add guests
-            names.map((name) => {
+            guests.map((guest) => {
                 guestStatement.executeSync({
-                    $mealId: mealId, $name: name, $status: 'invited'
+                    $mealId: mealId, $guest_id: guest.id, $name: guest.name, $status: 'invited'
                 });
             })
 

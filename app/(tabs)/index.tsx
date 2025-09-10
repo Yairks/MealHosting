@@ -11,19 +11,20 @@ import * as Contacts from 'expo-contacts';
 import React from "react";
 import NamesDropdown from "@/components/NamesDropdown";
 
+export type Guest = {
+    name: string
+    id: string
+}
+
 export default function Meals() {
     const dbOperations = useDBOperations()
     const [nameIds, setNameIds] = useState<string[]>([])
-    const [names, setNames] = useState<string[]>([])
+    const [guests, setGuests] = useState<Guest[]>([])
     const [date, setDate] = useState(new Date(Date.now()))
     const [meals, setMeals] = useState(dbOperations.getMealsFromDB())
     const [contacts, setContacts] = useState<Contacts.Contact[]>([])
-    const [contactsList, setContactsList] = useState<{ label: React.ReactElement, value: string }[]>([])
 
-    log.debug("This is a Debug log");
-    log.info("This is an Info log");
-    log.warn("This is a Warning log");
-    log.error("This is an Error log");
+    log.debug("Rendering index");
 
     useEffect(() => {
         (async () => {
@@ -53,20 +54,6 @@ export default function Meals() {
                         return a.name.localeCompare(b.name)
                     })
                     setContacts(data)
-                    setContactsList(data.map(contact => {
-                        const name = <Text style={{ fontWeight: "bold" }}>{contact.name}</Text>
-                        let label: React.ReactElement
-                        if (contact.phoneNumbers !== undefined && contact.phoneNumbers.length > 0) {
-                            label = <Text>{name}<Text style={{ fontWeight: "100" }}>{" " + contact.phoneNumbers!![0].number}</Text></Text>
-                        } else {
-                            label = name
-                        }
-
-                        return {
-                            label: label,
-                            value: contact.id!!,
-                        }
-                    }))
                 }
             }
             // For now, assume the user gave permission to access contacts.
@@ -74,13 +61,8 @@ export default function Meals() {
         })();
     }, []);
 
-    useEffect(() => {
-        const names = nameIds.map(id => contacts.filter(contact => id === contact.id)!![0].name)
-        setNames(names)
-    }, [nameIds])
-
-    const deleteName = (removeIndex: number) => {
-        setNameIds(nameIds.filter((name, i) => i != removeIndex))
+    const deleteGuest = (guestToDelete: Guest) => {
+        setGuests(guests.filter((guest) => guest.id !== guestToDelete.id))
     }
 
     const onChange = (_: any, selectedDate: Date | undefined) => {
@@ -100,7 +82,7 @@ export default function Meals() {
     };
 
     const saveMeal = () => {
-        dbOperations.saveMeal(date, names);
+        dbOperations.saveMeal(date, guests);
         setNameIds([]);
         setMeals(dbOperations.getMealsFromDB())
     }
@@ -139,22 +121,21 @@ export default function Meals() {
                                     <FontAwesome6 name="angle-down" iconStyle="brand" style={{ fontSize: 18, marginRight: 10 }} />
                                 </Pressable >
                                 <NamesDropdown
-                                    contactsList={contactsList}
-                                    setContactsList={setContactsList}
-                                    nameIds={nameIds}
-                                    setNames={setNameIds}
+                                    contacts={contacts}
+                                    guests={guests}
+                                    setGuests={setGuests}
                                 />
                                 {/* List of names */}
                                 {
-                                    (names.length > 0) ? (
+                                    (guests.length > 0) ? (
                                         <View style={{ marginTop: 8 }}>
                                             <Text style={{ fontSize: 18, fontWeight: "bold" }}>People:</Text>
                                             <FlatList
-                                                data={names}
-                                                renderItem={(name) =>
+                                                data={guests}
+                                                renderItem={(guest) =>
                                                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                        <Text onPress={() => { deleteName(name.index) }} style={{ color: "red", fontWeight: "bold", fontSize: 24, paddingRight: 4 }}>X</Text>
-                                                        <Text style={{ verticalAlign: "top", fontSize: 18, paddingLeft: 4 }}>{name.item}</Text>
+                                                        <Text onPress={() => { deleteGuest(guest.item) }} style={{ color: "red", fontWeight: "bold", fontSize: 24, paddingRight: 4 }}>X</Text>
+                                                        <Text style={{ verticalAlign: "top", fontSize: 18, paddingLeft: 4 }}>{guest.item.name}</Text>
                                                     </View>
                                                 } />
                                         </View>
